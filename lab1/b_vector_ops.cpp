@@ -32,6 +32,6 @@ vector<double> local_b_vector(
 void concat_local_vector(vector<double>* global_vector, vector<double> local_vector, int elem_number) {
     int offset = elem_number * 2;
     for (int i = 0; i < local_matrix_size; ++i) {
-        (*global_vector)[offset * elem_number+i] += local_vector[i];
+        (*global_vector)[offset+i] += local_vector[i];
     }
 }

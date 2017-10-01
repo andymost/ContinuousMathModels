@@ -21,7 +21,7 @@ void  add_local_matrix_to_global(local_matrix_type local_matrix, global_matrix_t
     int offset = elem_number * 2;
     for (int i = 0; i < local_matrix_size; ++i) {
         for (int j = 0; j < local_matrix_size; ++j) {
-            (*global_matrix)[offset * elem_number+i][offset * elem_number+j] += local_matrix[i][j];
+            (*global_matrix)[offset+i][offset+j] += local_matrix[i][j];
         }
     }
 }

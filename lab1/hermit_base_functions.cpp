@@ -44,3 +44,31 @@ double  psi(short index, double h_length, dot_type x_left, dot_type x) {
         default: return psi_4(h_length, x_left, x);
     }
 }
+
+
+
+double psi_d_1(double h_length, dot_type x_left, dot_type x) {
+    return 6/h_length*(-ksi(h_length, x_left, x) + pow(ksi(h_length, x_left, x), 2));
+}
+
+double psi_d_2(double h_length, dot_type x_left, dot_type x) {
+    return 1 - 4*ksi(h_length, x_left, x) + 3*pow(ksi(h_length, x_left, x), 2);
+}
+
+double psi_d_3(double h_length, dot_type x_left, dot_type x) {
+    return 6/h_length*(ksi(h_length, x_left, x) - pow(ksi(h_length, x_left, x), 2));
+}
+
+// базинсная эрмитова функция локальная 4 с учетом множителя
+double psi_d_4(double h_length, dot_type x_left, dot_type x) {
+    return -2*ksi(h_length, x_left, x) + 3 * pow(ksi(h_length, x_left, x), 2);
+}
+
+double  psi_derevative(short index, double h_length, dot_type x_left, dot_type x){
+    switch (index) {
+        case 0: return psi_d_1(h_length, x_left, x);
+        case 1: return psi_d_2(h_length, x_left, x);
+        case 2: return psi_d_3(h_length, x_left, x);
+        default: return psi_d_4(h_length, x_left, x);
+    }
+}

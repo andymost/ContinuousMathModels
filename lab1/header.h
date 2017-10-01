@@ -15,6 +15,19 @@ typedef struct {
     std::vector<std::vector<double>> weights; // веса
 } grid_type;
 
+typedef struct {
+    int omega_index;
+    int index;
+} elem_pos_type;
+
+typedef struct {
+    bool isSmaller; // разница м/у всем эл менше заданной
+    double mean;    // ср. разница
+    std::vector<elem_pos_type> elems; // адреса эл что больше среднего в формате:  [[omega_ind, index], ....]
+} diff_type;
+
+
+
 // расчет локальной матрицы регуляризатора бета
 local_matrix_type local_beta_matrix(double h_length);
 // расчет локальной матрицы a
@@ -47,6 +60,8 @@ std::vector<double> backward_solution(global_matrix_type u, std::vector<double> 
 std::vector<double> forward_solution(global_matrix_type l, std::vector<double> b);
 // i-ая базисная Эрмитова функция
 double  psi(short index, double h_length, dot_type x_left, dot_type x);
+// производная i-ой базисной Эрмитовой функции в точке
+double  psi_derevative(short index, double h_length, dot_type x_left, dot_type x);
 // локальный вектор правой части
 std::vector<double> local_b_vector(
         double h_length,
@@ -55,10 +70,10 @@ std::vector<double> local_b_vector(
 );
 
 // разница
-double difference(grid_type grid, std::vector<double> q);
+diff_type difference(grid_type grid, std::vector<double> q);
 
 // обновление сетки
-grid_type update_grid(grid_type grid, double diff, std::vector<double> q);
+grid_type update_grid(grid_type grid, diff_type diff);
 
 // добавление локального вектора в глобальный
 void concat_local_vector(
@@ -68,7 +83,8 @@ void concat_local_vector(
 );
 // расчет сплайна
 double spline(double x, grid_type grid, std::vector<double> q);
-
+// расчет производной сплайна
+double spline_derivatice(double x, grid_type grid, std::vector<double> q);
 
 grid_type read_grid();
 
@@ -78,7 +94,14 @@ const double beta = 0.001;
 const int omega_count = 2;
 // размерность глобальной матрицы
 const int global_matrix_size = 2 * omega_count + 2;
-
+// отношение среднего отклонения и локального
+const double diff_rel = 2;
+// во сколько раз уменьшаем w_j
+const double w_denominator = 2;
+// количество итераций сглаживания
+const int max_iteration = 10;
+//epsilon окрестность для сравнения чисел
+const double epsilon = 0.0000001;
 
 
 // размерность локальной матрицы

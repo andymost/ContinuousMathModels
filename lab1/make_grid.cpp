@@ -10,12 +10,23 @@ using namespace std;
 
 // grid_model - задача из учебника
 // linear_clean     f(x) = 2.5 + x
+// linear_noized    linear_clean(x) + rnornm(mean=1, sd=0.2)
 // cubic_clean      f(x) = 3 + 2x + 0.5x**3
-// sin              f(x) = 2*sin(Pi * x)
+// cubic_noized     cubic_noized(x) + rnornm(mean=1, sd=0.2)
+// sin_clean        f(x) = 2*sin(Pi * x)
+// sin_noized       sin_clean + rnornm(mean=1, sd=0.2)
+
+/*
+ * ГСЧ для шума значений
+
+rnormF <- function(f_vals){
+   f_vals + rnorm(n=length(f_vals), sd=0.2)
+}
+ * */
 
 grid_type read_grid() {
     grid_type grid;
-    fstream grid_file ("../resources/sin_clean.txt", ios_base::in);
+    fstream grid_file ("../resources/exp_errored.txt", ios_base::in);
     vector<double> tmp_vec;
 
     double h, len, x_val, f_val, w_val;
@@ -44,17 +55,9 @@ grid_type read_grid() {
     return grid;
 }
 
-grid_type update_grid(grid_type grid, double diff, vector<double> q) {
-
-    for (int i = 0; i < grid.points.size(); ++i) {
-        for (int j = 0; j < grid.points[i].size(); ++j) {
-            double local_diff = grid.f_value[i][j] - spline(grid.points[i][j], grid, q);
-            if(abs(local_diff) > diff){
-                grid.weights[i][j] = grid.weights[i][j]/2;
-            }
-
-
-        }
+grid_type update_grid(grid_type grid, diff_type diff) {
+    for(auto elem:diff.elems) {
+        grid.weights[elem.omega_index][elem.index] = grid.weights[elem.omega_index][elem.index]/w_denominator;
     }
 
     return grid;
