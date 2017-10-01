@@ -36,8 +36,8 @@ local_matrix_type local_beta_matrix(double h_length) {
 // локальная матрица для КЭ
 local_matrix_type local_a_matrix(
         double h_length,
-        std::vector<dot_type> points,
-        std::vector<dot_type> weights
+        int omega_number,
+        grid_type grid
 ) {
     // инициализация, заполним сразу нулями, так проще будет
     local_matrix_type result;
@@ -46,12 +46,18 @@ local_matrix_type local_a_matrix(
         result.push_back(tmp);
     }
 
+    std::vector<double> points = grid.points[omega_number];
+    std::vector<double> weights = grid.weights[omega_number];
+    double x_left = omega_number == 0 ?
+                    points[0] :
+                    grid.points[omega_number - 1][grid.points[omega_number - 1].size() - 1];
+
     for (short i = 0; i < local_matrix_size; ++i) {
         for (short j = 0; j < local_matrix_size; ++j) {
             for (int k = 0; k < points.size(); ++k) {
 
-                double psi_i = psi(i, h_length, points[0], points[k]);
-                double psi_j = psi(j, h_length, points[0], points[k]);
+                double psi_i = psi(i, h_length, x_left, points[k]);
+                double psi_j = psi(j, h_length, x_left, points[k]);
 
                 double a_ij_for_k = weights[k] * psi_i * psi_j;
                 result[i][j] += a_ij_for_k;

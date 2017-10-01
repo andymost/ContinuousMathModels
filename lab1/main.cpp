@@ -1,4 +1,5 @@
 #include "header.h"
+#include <iostream>
 
 using namespace std;
 
@@ -6,28 +7,41 @@ int main( int argc, const char *argv[] ) {
     grid_type grid;
 
     grid = read_grid();
-    vector<double> b_vector(global_matrix_size, 0);
-    global_matrix_type global_matrix = init_global_matrix();
 
-    // Расчет локальных матриц и векторов + добавление в глобальную
-    for (int i = 0; i < omega_count; ++i) {
-        local_matrix_type beta_matrix = local_beta_matrix(grid.h_length[i]);
-        local_matrix_type a_matrix = local_a_matrix(grid.h_length[i], grid.points[i], grid.weights[i]);
-        local_matrix_type local_matrix = sum_local_matrix(a_matrix, beta_matrix);
-        vector<double> b_local = local_b_vector(grid.h_length[i], grid.points[i], grid.weights[i], grid.f_value[i]);
+    const int max_iteration = 3;
+    const double max_difference = 0.1;
 
-        concat_local_vector(&b_vector, b_local, i);
-        add_local_matrix_to_global(local_matrix, &global_matrix, i);
+    vector<double> b_vector = calc_global_vector(grid);
+    global_matrix_type global_matrix = calc_global_matrix(grid);
+    vector<double> q = calc_spline_params(global_matrix, b_vector);
+    double diff = difference(grid, q);
+
+
+    for (int j = 0; j < max_iteration && diff > max_difference ; ++j) {
+        grid = update_grid(grid, diff, q);
+        b_vector = calc_global_vector(grid);
+        global_matrix = calc_global_matrix(grid);
+        q = calc_spline_params(global_matrix, b_vector);
+        diff = difference(grid, q);
     }
 
-    // Разложение глобальной матрицы
-    global_matrix_type l_matrix = init_global_matrix();
-    global_matrix_type u_matrix = init_global_matrix();
+    cout<<"DIFF: "<<diff<<endl;
 
-    lu_decomp(global_matrix, l_matrix, u_matrix);
+    cout<<"Q vector: "<<endl;
+    for (int i = 0; i < global_matrix_size; ++i) {
+        cout<<q[i]<<"  ";
+    }
+    cout<<endl;
 
-    vector<double> x_1 = forward_solution(l_matrix, b_vector);
-    vector<double> res = backward_solution(u_matrix, x_1);
+    double x = grid.points[0][0];
+    double x_end = grid.points[grid.points.size() - 1][grid.points[grid.points.size() - 1].size() -1];
+    double step = 0.1;
+
+    while(x <= x_end){
+        cout<<"X: "<<x<<"  P(x): "<<spline(x,grid,q)<<endl;
+        x += step;
+    }
+
 
     return 0 ;
 }

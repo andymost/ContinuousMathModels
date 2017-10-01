@@ -18,13 +18,25 @@ typedef struct {
 // расчет локальной матрицы регуляризатора бета
 local_matrix_type local_beta_matrix(double h_length);
 // расчет локальной матрицы a
-local_matrix_type local_a_matrix(double h_length, std::vector<dot_type> points, std::vector<dot_type> weights);
+local_matrix_type local_a_matrix(
+        double h_length,
+        int omega_number,
+        grid_type grid
+);
 // сумма локальных матриц
 local_matrix_type sum_local_matrix(local_matrix_type a, local_matrix_type b);
 // инициализация глобальной матрицы
 global_matrix_type init_global_matrix();
 // добавление локальной матрицы в глобальную
 void  add_local_matrix_to_global(local_matrix_type local_matrix, global_matrix_type* global_matrix, int elem_number);
+// расчет глобальной матрицы
+global_matrix_type calc_global_matrix(grid_type grid);
+// расчет глобального вектора
+std::vector<double> calc_global_vector(grid_type grid);
+// расчет коэффициентов сплайна
+std::vector<double> calc_spline_params(global_matrix_type global_matrix, std::vector<double> b_vector);
+
+
 // lu-разложение
 void lu_decomp(global_matrix_type A, global_matrix_type &L, global_matrix_type  &U);
 // перемножение квадратных матриц
@@ -38,16 +50,25 @@ double  psi(short index, double h_length, dot_type x_left, dot_type x);
 // локальный вектор правой части
 std::vector<double> local_b_vector(
         double h_length,
-        std::vector<dot_type> points,
-        std::vector<dot_type> weights,
-        std::vector<dot_type> f_values
+        grid_type grid,
+        int omega_number
 );
+
+// разница
+double difference(grid_type grid, std::vector<double> q);
+
+// обновление сетки
+grid_type update_grid(grid_type grid, double diff, std::vector<double> q);
+
 // добавление локального вектора в глобальный
 void concat_local_vector(
         std::vector<double>* global_vector,
         std::vector<double> local_vector,
         int elem_number
 );
+// расчет сплайна
+double spline(double x, grid_type grid, std::vector<double> q);
+
 
 grid_type read_grid();
 
@@ -57,6 +78,8 @@ const double beta = 0.001;
 const int omega_count = 2;
 // размерность глобальной матрицы
 const int global_matrix_size = 2 * omega_count + 2;
+
+
 
 // размерность локальной матрицы
 const int local_matrix_size = 4;

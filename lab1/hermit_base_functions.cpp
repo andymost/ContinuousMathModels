@@ -3,6 +3,8 @@
 //
 #include "header.h"
 #include <cmath>
+#include <iostream>
+using namespace std;
 
 
 // подстановочное кси

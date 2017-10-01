@@ -25,3 +25,17 @@ void  add_local_matrix_to_global(local_matrix_type local_matrix, global_matrix_t
         }
     }
 }
+
+global_matrix_type calc_global_matrix(grid_type grid) {
+    // Расчет локальных матриц и векторов + добавление в глобальную
+    global_matrix_type global_matrix = init_global_matrix();
+    for (int i = 0; i < omega_count; ++i) {
+        local_matrix_type beta_matrix = local_beta_matrix(grid.h_length[i]);
+        local_matrix_type a_matrix = local_a_matrix(grid.h_length[i], i, grid);
+        local_matrix_type local_matrix = sum_local_matrix(a_matrix, beta_matrix);
+
+        add_local_matrix_to_global(local_matrix, &global_matrix, i);
+    }
+
+    return global_matrix;
+}

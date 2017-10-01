@@ -7,16 +7,22 @@ using namespace std;
 
 vector<double> local_b_vector(
         double h_length,
-        vector<dot_type> points,
-        vector<dot_type> weights,
-        vector<dot_type> f_values
+        grid_type grid,
+        int omega_number
 ) {
     vector<double> result(local_matrix_size, 0);
+    vector<double> points = grid.points[omega_number];
+    vector<double> weights = grid.weights[omega_number];
+    vector<double> f_values = grid.f_value[omega_number];
+
+    double x_p = omega_number == 0 ?
+                 points[0] :
+                 grid.points[omega_number - 1][grid.points[omega_number - 1].size() - 1];
 
     for (short j = 0; j < local_matrix_size; ++j) {
         for (int k = 0; k < points.size(); ++k) {
             result[j] += weights[k] * f_values[k] *
-                    psi(j, h_length, points[0], points[k]);
+                    psi(j, h_length, x_p, points[k]);
         }
     }
 
